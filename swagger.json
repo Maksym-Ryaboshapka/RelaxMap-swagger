@@ -11,6 +11,64 @@
         }
     ],
     "paths": {
+        "/places": {
+            "get": {
+                "tags": [
+                    "place-controller"
+                ],
+                "operationId": "getPlacesForUser",
+                "parameters": [
+                    {
+                        "name": "pageable",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/Pageable"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PageResponsePlaceResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "place-controller"
+                ],
+                "operationId": "createPlace",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PlaceRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PlaceResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/auth/register": {
             "post": {
                 "tags": [
@@ -160,10 +218,130 @@
                     }
                 }
             }
+        },
+        "/places/all": {
+            "get": {
+                "tags": [
+                    "place-controller"
+                ],
+                "operationId": "getAllPlaces",
+                "parameters": [
+                    {
+                        "name": "pageable",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/Pageable"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PageResponsePlaceResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/images/{imageName}": {
+            "get": {
+                "tags": [
+                    "image-controller"
+                ],
+                "operationId": "getImage",
+                "parameters": [
+                    {
+                        "name": "imageName",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "image/*": {}
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
         "schemas": {
+            "PlaceRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 96,
+                        "minLength": 3
+                    },
+                    "placeType": {
+                        "type": "string",
+                        "maxLength": 96,
+                        "minLength": 3
+                    },
+                    "region": {
+                        "type": "string",
+                        "maxLength": 96,
+                        "minLength": 3
+                    },
+                    "description": {
+                        "type": "string",
+                        "maxLength": 2000,
+                        "minLength": 20
+                    }
+                },
+                "required": [
+                    "name",
+                    "placeType",
+                    "region"
+                ]
+            },
+            "PlaceResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "placeType": {
+                        "type": "string"
+                    },
+                    "region": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "imageName": {
+                        "type": "string"
+                    }
+                }
+            },
             "RegisterRequest": {
                 "type": "object",
                 "properties": {
@@ -257,6 +435,54 @@
                     },
                     "email": {
                         "type": "string"
+                    }
+                }
+            },
+            "Pageable": {
+                "type": "object",
+                "properties": {
+                    "page": {
+                        "type": "integer",
+                        "format": "int32",
+                        "minimum": 0
+                    },
+                    "size": {
+                        "type": "integer",
+                        "format": "int32",
+                        "minimum": 1
+                    },
+                    "sort": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "PageResponsePlaceResponse": {
+                "type": "object",
+                "properties": {
+                    "content": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PlaceResponse"
+                        }
+                    },
+                    "totalElements": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "totalPages": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "pageNumber": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "pageSize": {
+                        "type": "integer",
+                        "format": "int32"
                     }
                 }
             }
