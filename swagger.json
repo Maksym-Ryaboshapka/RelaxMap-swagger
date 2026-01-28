@@ -11,35 +11,37 @@
         }
     ],
     "paths": {
-        "/places": {
-            "get": {
+        "/reviews": {
+            "post": {
                 "tags": [
-                    "place-controller"
+                    "review-controller"
                 ],
-                "operationId": "getPlacesForUser",
-                "parameters": [
-                    {
-                        "name": "pageable",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/components/schemas/Pageable"
+                "operationId": "createReview",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReviewRequest"
+                            }
                         }
-                    }
-                ],
+                    },
+                    "required": true
+                },
                 "responses": {
                     "200": {
                         "description": "OK",
                         "content": {
                             "*/*": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/PageResponsePlaceResponse"
+                                    "$ref": "#/components/schemas/ReviewResponse"
                                 }
                             }
                         }
                     }
                 }
-            },
+            }
+        },
+        "/places": {
             "post": {
                 "tags": [
                     "place-controller"
@@ -87,21 +89,11 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Register success",
+                        "description": "OK",
                         "content": {
                             "*/*": {
                                 "schema": {
                                     "$ref": "#/components/schemas/TokenResponse"
-                                }
-                            }
-                        }
-                    },
-                    "409": {
-                        "description": "User already exists",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
                                 }
                             }
                         }
@@ -157,7 +149,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Login success",
+                        "description": "OK",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -165,21 +157,34 @@
                                 }
                             }
                         }
-                    },
-                    "401": {
-                        "description": "Invalid credentials",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
                     }
                 }
             }
         },
-        "/users/{email}": {
+        "/auth/change-password": {
+            "patch": {
+                "tags": [
+                    "auth-controller"
+                ],
+                "operationId": "changePassword",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PasswordRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/users": {
             "get": {
                 "tags": [
                     "user-controller"
@@ -187,9 +192,18 @@
                 "operationId": "getUser",
                 "parameters": [
                     {
+                        "name": "id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    {
                         "name": "email",
-                        "in": "path",
-                        "required": true,
+                        "in": "query",
+                        "required": false,
                         "schema": {
                             "type": "string"
                         }
@@ -205,13 +219,90 @@
                                 }
                             }
                         }
-                    },
-                    "404": {
-                        "description": "Not Found",
+                    }
+                }
+            }
+        },
+        "/reviews/for-place/{id}": {
+            "get": {
+                "tags": [
+                    "review-controller"
+                ],
+                "operationId": "getReviewsForPlace",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "content": {
                             "*/*": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ReviewResponse"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/reviews/all": {
+            "get": {
+                "tags": [
+                    "review-controller"
+                ],
+                "operationId": "getAllReviews",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ReviewResponse"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/places/for-user": {
+            "get": {
+                "tags": [
+                    "place-controller"
+                ],
+                "operationId": "getPlacesForUser",
+                "parameters": [
+                    {
+                        "name": "pageable",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/Pageable"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PageResponsePlaceResponse"
                                 }
                             }
                         }
@@ -284,10 +375,81 @@
                     }
                 }
             }
+        },
+        "/reviews/{id}": {
+            "delete": {
+                "tags": [
+                    "review-controller"
+                ],
+                "operationId": "deleteReview",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
         }
     },
     "components": {
         "schemas": {
+            "ReviewRequest": {
+                "type": "object",
+                "properties": {
+                    "text": {
+                        "type": "string",
+                        "maxLength": 1000,
+                        "minLength": 20
+                    },
+                    "rating": {
+                        "type": "integer",
+                        "format": "int32",
+                        "maximum": 5,
+                        "minimum": 1
+                    },
+                    "placeId": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                },
+                "required": [
+                    "text"
+                ]
+            },
+            "ReviewResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "text": {
+                        "type": "string"
+                    },
+                    "rating": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "userId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "placeId": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                }
+            },
             "PlaceRequest": {
                 "type": "object",
                 "properties": {
@@ -379,22 +541,6 @@
                     }
                 }
             },
-            "ErrorResponse": {
-                "type": "object",
-                "properties": {
-                    "message": {
-                        "type": "string"
-                    },
-                    "timestamp": {
-                        "type": "integer",
-                        "format": "int64"
-                    },
-                    "status": {
-                        "type": "integer",
-                        "format": "int32"
-                    }
-                }
-            },
             "RefreshRequest": {
                 "type": "object",
                 "properties": {
@@ -421,6 +567,25 @@
                 "required": [
                     "email",
                     "password"
+                ]
+            },
+            "PasswordRequest": {
+                "type": "object",
+                "properties": {
+                    "oldPassword": {
+                        "type": "string",
+                        "maxLength": 128,
+                        "minLength": 8
+                    },
+                    "newPassword": {
+                        "type": "string",
+                        "maxLength": 128,
+                        "minLength": 8
+                    }
+                },
+                "required": [
+                    "newPassword",
+                    "oldPassword"
                 ]
             },
             "UserResponse": {
@@ -481,6 +646,22 @@
                         "format": "int32"
                     },
                     "pageSize": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                }
+            },
+            "ErrorResponse": {
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "type": "string"
+                    },
+                    "timestamp": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "status": {
                         "type": "integer",
                         "format": "int32"
                     }
