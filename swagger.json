@@ -261,6 +261,14 @@
                             "type": "integer",
                             "format": "int64"
                         }
+                    },
+                    {
+                        "name": "pageable",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/Pageable"
+                        }
                     }
                 ],
                 "responses": {
@@ -269,10 +277,7 @@
                         "content": {
                             "*/*": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/ReviewResponse"
-                                    }
+                                    "$ref": "#/components/schemas/PageResponseReviewResponse"
                                 }
                             }
                         }
@@ -286,16 +291,23 @@
                     "review-controller"
                 ],
                 "operationId": "getAllReviews",
+                "parameters": [
+                    {
+                        "name": "pageable",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/Pageable"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "content": {
                             "*/*": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/ReviewResponse"
-                                    }
+                                    "$ref": "#/components/schemas/PageResponseReviewResponse"
                                 }
                             }
                         }
@@ -670,6 +682,33 @@
                         "items": {
                             "type": "string"
                         }
+                    }
+                }
+            },
+            "PageResponseReviewResponse": {
+                "type": "object",
+                "properties": {
+                    "content": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ReviewResponse"
+                        }
+                    },
+                    "totalElements": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "totalPages": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "pageNumber": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "pageSize": {
+                        "type": "integer",
+                        "format": "int32"
                     }
                 }
             },
