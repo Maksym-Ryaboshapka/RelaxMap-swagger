@@ -184,7 +184,30 @@
                 }
             }
         },
-        "/users": {
+        "/auth/change-name": {
+            "patch": {
+                "tags": [
+                    "auth-controller"
+                ],
+                "operationId": "changeName",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/NameRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/users/info": {
             "get": {
                 "tags": [
                     "user-controller"
@@ -372,6 +395,19 @@
                                 }
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/users/delete-account": {
+            "delete": {
+                "tags": [
+                    "user-controller"
+                ],
+                "operationId": "deleteUser",
+                "responses": {
+                    "200": {
+                        "description": "OK"
                     }
                 }
             }
@@ -586,6 +622,19 @@
                 "required": [
                     "newPassword",
                     "oldPassword"
+                ]
+            },
+            "NameRequest": {
+                "type": "object",
+                "properties": {
+                    "newName": {
+                        "type": "string",
+                        "maxLength": 32,
+                        "minLength": 2
+                    }
+                },
+                "required": [
+                    "newName"
                 ]
             },
             "UserResponse": {
